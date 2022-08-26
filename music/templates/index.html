@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Index</title>
+{% endblock %}
+
+{% block css_styling %}
+<link rel="stylesheet" href="{%static 'index.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="search-sec">
+  <form method="post" action="">
+    {% csrf_token %}
+      {% for field in form %}
+      {{field}}
+      {% endfor %}
+      <button type="submit">Submit</button>
+  </form>
+</div>
+<div id="data-container">
+  <h1>Track</h1>
+  {% if is_song %}
+  {% for song in songs %}
+  <div class="single-name">
+  <p>{{song.track_name}}</p>
+    </div>
+  {% endfor %}
+  {% endif %}
+  <h1>Album</h1>
+  {% if is_album %}
+  {% for album in albums %}
+  <div class="single-name">
+  <p>{{album.album_name}}</p>
+  </div>
+  {% endfor %}
+  {% endif %}
+  <h1>Artist</h1>
+   {% if is_artist %}
+  {% for artist in artists %}
+  <div class="single-name">
+  <p>{{artist.artist_name}}</p>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}
