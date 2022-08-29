@@ -1,46 +1,53 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
+import time
+User = get_user_model()
 
 
 class Track(models.Model):
-    track_name = models.CharField(max_length=50)
-    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, related_name='track')
-    album = models.ForeignKey('Album', on_delete=models.CASCADE, related_name='track')
-    genre = models.ManyToManyField('Genre', related_name='track')
-    length = models.CharField(max_length=10)
+    name = models.CharField(max_length=50)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, related_name='tracks')
+    album = models.ForeignKey('Album', on_delete=models.CASCADE, related_name='tracks')
+    genre = models.ManyToManyField('Genre', related_name='tracks')
+    length = models.PositiveIntegerField()
     thumbnail = models.CharField(max_length=50)
     song = models.FileField(upload_to='mp3')
 
+    @property
+    def duration(self):
+        converted_format = time.strftime("%H:%M:%S", time.gmtime(self.length))
+        return converted_format
+
     def __str__(self):
-        return f"{self.track_name} {self.artist} {self.album}"
+        return f"{self.name}"
 
 
 class Artist(models.Model):
-    artist_name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.artist_name}"
+        return f"{self.name}"
 
 
 class Album(models.Model):
-    album_name = models.CharField(max_length=50)
-    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, related_name='album')
+    name = models.CharField(max_length=50)
+    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, related_name='albums')
 
     def __str__(self):
-        return f"{self.album_name}"
+        return f"{self.name}"
 
 
 class Genre(models.Model):
-    genre_name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.genre_name}"
+        return f"{self.name}"
 
 
-class Playlist(AbstractUser):
-    playlist_name = models.CharField(max_length=50)
-    track = models.ManyToManyField('Track', related_name= 'playlist')
-    liked_songs = models.CharField(max_length=300, null=True)
+class Playlist(models.Model):
+    name = models.CharField(max_length=50)
+    track = models.ManyToManyField('Track', related_name='playlists')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='playlists')
 
     def __str__(self):
-        return f"{self.playlist_name} {self.username}"
+        return f"{self.name}"

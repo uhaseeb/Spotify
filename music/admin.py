@@ -3,11 +3,11 @@ from .models import Track, Album, Artist, Genre, Playlist
 
 
 class TrackAdmin(admin.ModelAdmin):
-    list_display = ("track_name", "album", "artist")
+    list_display = ("name",)
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    list_display = ("album_name", "artist")
+    list_display = ("name",)
 
 
 admin.site.register(Track, TrackAdmin)
