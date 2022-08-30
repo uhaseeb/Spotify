@@ -4,6 +4,7 @@ from .models import Track, Album, Artist, Genre, Playlist
 
 class TrackAdmin(admin.ModelAdmin):
     list_display = ("name",)
+    prepopulated_fields = {'slug': ("name",)}
 
 
 class AlbumAdmin(admin.ModelAdmin):

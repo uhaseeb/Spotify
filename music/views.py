@@ -20,3 +20,26 @@ class IndexView(View):
     def get(self, request):
         form = SearchForm()
         return render(request, 'index.html', {'form': form})
+
+
+class SongDetailView(View):
+    def get(self, request, id):
+        track = Track.objects.get(id=id)
+        context = {'track': track}
+        return render(request, 'song_detail.html', context)
+
+
+class AlbumDetailView(View):
+    def get(self, request, id):
+        album = Album.objects.get(id=id)
+        all_tracks = album.tracks.all()
+        context = {'album': album, 'all_tracks': all_tracks}
+        return render(request, 'album_detail.html', context)
+
+
+class ArtistDetailView(View):
+    def get(self, request, id):
+        artist = Artist.objects.get(id=id)
+        all_albums = artist.albums.all()
+        context = {'artist': artist, 'all_albums': all_albums}
+        return render(request, 'artist_detail.html', context)
