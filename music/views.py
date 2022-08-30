@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from django.views.generic import View
+from django.views.generic.edit import CreateView
 from .forms import SearchForm
+from users.forms import AuthenticationForm
 from .models import Track, Album, Artist, Genre, Playlist
+from users.models import User
+from django.contrib.auth import authenticate, login
 
 
 class IndexView(View):
@@ -43,3 +47,20 @@ class ArtistDetailView(View):
         all_albums = artist.albums.all()
         context = {'artist': artist, 'all_albums': all_albums}
         return render(request, 'artist_detail.html', context)
+
+
+class SignupView(CreateView):
+    model = User
+    form_class = AuthenticationForm
+    template_name = 'signup.html'
+
+
+class CreateUserView(View):
+    model = User
+    form_class = AuthenticationForm, SearchForm
+
+    def post(self, request):
+        return render(request, 'index.html')
+
+    def get(self, request):
+        return

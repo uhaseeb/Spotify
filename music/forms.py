@@ -1,4 +1,5 @@
 from django import forms
+from users.models import User
 
 
 class SearchForm(forms.Form):
@@ -7,3 +8,5 @@ class SearchForm(forms.Form):
                                  'required': 'This field is required',
                                  'max_length': 'Max length character exceeds'
                              })
+
+
