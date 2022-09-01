@@ -19,6 +19,8 @@
       <button type="submit">Submit</button>
     </form>
   </div>
+  <a href="{% url 'logout' %}">Logout</a>
+  <a href="{% url 'profile_view' %}">View Profile</a>
   <div id="data-container">
     <h1>Track</h1>
     {% for song in songs %}

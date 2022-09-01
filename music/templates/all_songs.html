@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  All Songs
+{% endblock %}
+
+{% block css_styling %}
+{% endblock %}
+
+{% block content %}
+<div id="songs-sec">
+  <ul>
+    {% for song in all_songs %}
+      {{song.name}}
+      <br><br>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
