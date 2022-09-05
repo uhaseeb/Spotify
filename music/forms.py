@@ -1,5 +1,4 @@
 from django import forms
-from users.models import User
 
 
 class SearchForm(forms.Form):
@@ -10,3 +9,9 @@ class SearchForm(forms.Form):
                              })
 
 
+class CreatePlaylistForm(forms.Form):
+    name = forms.CharField(max_length=100, label='Enter Playlist Name')
+
+
+class FavouritesForm(forms.Form):
+    song = forms.IntegerField()

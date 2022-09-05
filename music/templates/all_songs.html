@@ -12,7 +12,8 @@
 <div id="songs-sec">
   <ul>
     {% for song in all_songs %}
-      {{song.name}}
+      <h1><a href="{% url 'song_detail' song.id%}">{{song.name}}</a></h1>
+      <a href=""></a>
       <br><br>
     {% endfor %}
   </ul>

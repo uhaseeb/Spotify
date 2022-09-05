@@ -1,21 +1,19 @@
-from django.contrib.auth.views import logout_then_login
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.contrib.auth import authenticate, login, logout
-from .forms import SearchForm
+from .forms import SearchForm, CreatePlaylistForm, FavouritesForm
 from users.forms import SignupForm, LoginForm
 from .models import Track, Album, Artist, Genre, Playlist
 from users.models import User
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 
 
 class IndexView(LoginRequiredMixin, View):
-    # login_url = '/login/'
-    # redirect_field_name = 'redirect_to'
     template_name = 'index.html'
     form = SearchForm
 
@@ -36,9 +34,34 @@ class IndexView(LoginRequiredMixin, View):
 class TrackDetailView(View):
 
     def get(self, request, id):
+        user = User.objects.get(username=request.user)
+        all_playlist = user.playlists.all()
         track = Track.objects.get(id=id)
-        context = {'track': track}
+        context = {'track': track, 'all_playlist': all_playlist}
         return render(request, 'song_detail.html', context)
+
+    def post(self, request, id):
+        playlist_id = request.POST['selected_playlist']
+        playlist = Playlist.objects.get(id=playlist_id)
+        song = Track.objects.get(id=id)
+        playlist.track.add(song)
+        playlist.save()
+        path = reverse('detail_playlist', args=[playlist.name])
+        return HttpResponseRedirect(path)
+
+
+class FavoriteTrackDetailView(View):
+    def post(self, request):
+        fav_id = request.POST['fav_id']
+        track = Track.objects.get(id=fav_id)
+        user = User.objects.get(username=request.user)
+        liked_songs = user.playlists.get(name='liked_songs')
+        if liked_songs.track.filter(id=fav_id).exists():
+            is_fav = True
+        else:
+            is_fav = False
+
+        return render(request, 'song_detail.html', {'is_fav': is_fav})
 
 
 class AllTracksView(ListView):
@@ -147,3 +170,30 @@ class ProfileView(LoginRequiredMixin, View):
         all_playlists = user.playlists.all()
         context = {'user': user, 'all_playlists': all_playlists}
         return render(request, 'user_detail.html', context)
+
+
+class DetailPlaylistView(View):
+    def get(self, request, name):
+        user = User.objects.get(username=request.user)
+        playlist = user.playlists.get(name=name)
+        all_tracks = playlist.track.all()
+        context = {'playlist': playlist, 'all_tracks': all_tracks}
+        return render(request, 'playlist_detail.html', context)
+
+
+class CreatePlaylistView(View):
+    def post(self, request):
+        form = CreatePlaylistForm(request.POST)
+        name = request.POST['name']
+        if form.is_valid():
+            user = User.objects.get(username=request.user)
+            user.playlists.create(name=name)
+            return HttpResponseRedirect('profile_view')
+        else:
+            return render(request, 'create_playlist.html', {'form': form})
+
+    def get(self, request):
+        form = CreatePlaylistForm()
+        return render(request, 'create_playlist.html', {'form': form})
+
+
