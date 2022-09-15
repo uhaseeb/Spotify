@@ -19,23 +19,25 @@
       <button type="submit">Submit</button>
     </form>
   </div>
+  <a href="{% url 'logout' %}">Logout</a>
+  <a href="{% url 'profile_view' %}">View Profile</a>
   <div id="data-container">
     <h1>Track</h1>
     {% for song in songs %}
       <div class="single-name">
-        <p>{{song.name}}</p>
+        <a href="{% url 'song_detail' song.id %}"><p>{{song.name}}</p></a>
       </div>
     {% endfor %}
     <h1>Album</h1>
     {% for album in albums %}
       <div class="single-name">
-        <p>{{album.name}}</p>
+        <a href="{% url 'album_detail' album.id %}"><p>{{album.name}}</p></a>
       </div>
     {% endfor %}
     <h1>Artist</h1>
     {% for artist in artists %}
       <div class="single-name">
-        <p>{{artist.name}}</p>
+        <a href="{% url 'artist_detail' artist.id %}"><p>{{artist.name}}</p></a>
       </div>
     {% endfor %}
   </div>
