@@ -9,10 +9,10 @@
 {% block content %}
     <h1>Album: {{album.name}}</h1>
     <h2>Artist: {{album.artist}}</h2>
-      <h2>All Tracks</h2>
+    <h2>All Tracks</h2>
     <ul>
         {% for track in all_tracks %}
-        <a href="{% url 'song_detail' track.id %}"><li><h2>{{track.name}}</h2></li></a>
+            <li><a href="{% url 'song_detail' track.id %}"><h2>{{track.name}}</h2></a></li>
         {% endfor %}
     </ul>
 {% endblock %}
