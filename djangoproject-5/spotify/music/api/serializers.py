@@ -81,5 +81,6 @@ class UpdateTrackSerializer(serializers.ModelSerializer):
         instance.album = validated_data.get('album', instance.album)
         instance.length = validated_data.get('length', instance.length)
         instance.thumbnail = validated_data.get('thumbnail', instance.thumbnail)
+
         instance.save()
         return instance
