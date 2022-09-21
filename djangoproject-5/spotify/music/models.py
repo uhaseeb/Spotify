@@ -11,7 +11,7 @@ class Track(models.Model):
     genre = models.ManyToManyField('Genre', related_name='tracks')
     length = models.PositiveIntegerField()
     thumbnail = models.CharField(max_length=50)
-    song = models.FileField(upload_to='mp3')
+    song = models.FileField(upload_to='mp3', blank=True)
 
     @property
     def duration(self):
@@ -47,7 +47,7 @@ class Genre(models.Model):
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
     track = models.ManyToManyField('Track', related_name='playlists')
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='playlists')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')
 
     def __str__(self):
         return f"{self.name}"

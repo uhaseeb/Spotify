@@ -7,3 +7,11 @@ class SearchForm(forms.Form):
                                  'required': 'This field is required',
                                  'max_length': 'Max length character exceeds'
                              })
+
+
+class CreatePlaylistForm(forms.Form):
+    name = forms.CharField(max_length=100, label='Enter Playlist Name')
+
+
+class FavouritesForm(forms.Form):
+    song = forms.IntegerField()
