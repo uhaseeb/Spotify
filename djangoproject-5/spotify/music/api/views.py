@@ -3,7 +3,7 @@ from users.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import serializers, exceptions
 from rest_framework import generics
-from .serializers import TrackSerializer, AlbumSerializer, ArtistSerializer, UserLoginSerializer, CreateTrackSerializer, UpdateTrackSerializer
+from .serializers import TrackSerializer, AlbumSerializer, ArtistSerializer, UserLoginSerializer,UserSignupSerializer, CreateTrackSerializer, UpdateTrackSerializer, ListAlbumSerializer, FavoritesSerializer, AddtoPlaylistSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +16,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.urls import reverse
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.validators import ValidationError
 
 
 class IndexAPIView(APIView):
@@ -83,6 +84,12 @@ class TracksListingAPIView(generics.ListAPIView):
     ordering = ['id']
 
 
+class SignupAPIView(generics.CreateAPIView):
+    serializer_class = UserSignupSerializer
+    model = User
+    queryset = User.objects.all()
+
+
 class LoginAPIView(APIView):
     queryset = User.objects.all()
     serializer_class = UserLoginSerializer
@@ -115,6 +122,69 @@ class CreateTrackAPIView(generics.CreateAPIView):
     model = Track
     queryset = Track.objects.all()
 
+
+class ArtistListAPIView(generics.ListAPIView):
+    serializer_class = ArtistSerializer
+    model = Artist
+    queryset = Artist.objects.all()
+
+
+class AlbumListAPIView(generics.ListAPIView):
+    serializer_class = ListAlbumSerializer
+    queryset = Album.objects.all()
+    model = Album
+
+
+class FavoritesAPIView(APIView):
+    queryset = Track.objects.all()
+    model = Track
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        favorite_serializer = FavoritesSerializer(data=request.data)
+        favorite_serializer.is_valid(raise_exception=True)
+        track = favorite_serializer.validated_data['id']
+        # track = get_object_or_404(Track, id=track_id)
+        liked_songs = request.user.playlists.get(name='liked_songs')
+        is_fav = liked_songs.track.filter(id=track.id).exists()
+        if not is_fav:
+            liked_songs.track.add(track)
+        else:
+            liked_songs.track.remove(track)
+
+        liked_playlist_tracks = liked_songs.track.all()
+        track_serializer = TrackSerializer(data=liked_playlist_tracks, many=True)
+        track_serializer.is_valid()
+        return Response(track_serializer.data)
+
+
+class AddToPlaylistView(APIView):
+    queryset = Track.objects.all()
+    model = Track
+    serializer_class = AddtoPlaylistSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        playlist_serializer = AddtoPlaylistSerializer(data=request.data)
+        playlist_serializer.is_valid(raise_exception=True)
+        track = playlist_serializer.validated_data['id']
+        playlist_name = playlist_serializer.validated_data['name']
+        if request.user.playlists.filter(name=playlist_name).exists():
+            user_playlist = request.user.playlists.get(name=playlist_name)
+            in_playlist = user_playlist.track.filter(name=track.name).exists()
+            if not in_playlist:
+                user_playlist.track.add(track)
+            else:
+                user_playlist.track.remove(track)
+        else:
+            raise ValidationError({"message": "Does not exist"})
+
+        playlist_tracks = user_playlist.track.all()
+        track_serializer = TrackSerializer(data=playlist_tracks, many=True)
+        track_serializer.is_valid()
+        return Response(track_serializer.data)
 
 
 
