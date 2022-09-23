@@ -64,7 +64,8 @@ class UserSignupSerializer(serializers.ModelSerializer):
             user = User.objects.create(**validated_data)
             user.set_password(user.password)
             user.save()
-            user.playlists.create(name='liked_songs')
+            all_tracks = Track.objects.all()
+            user.liked_songs(*all_tracks)
             return user
         else:
             return response("Password doesnot matches")
