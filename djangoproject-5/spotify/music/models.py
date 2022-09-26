@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 import time
-User = get_user_model()
 
 
 class Track(models.Model):
@@ -47,7 +45,8 @@ class Genre(models.Model):
 class Playlist(models.Model):
     name = models.CharField(max_length=50)
     track = models.ManyToManyField('Track', related_name='playlists')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='playlists')
 
     def __str__(self):
         return f"{self.name}"
+
