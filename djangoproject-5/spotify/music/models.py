@@ -1,7 +1,5 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 import time
-User = get_user_model()
 
 
 class Track(models.Model):
@@ -11,7 +9,7 @@ class Track(models.Model):
     genre = models.ManyToManyField('Genre', related_name='tracks')
     length = models.PositiveIntegerField()
     thumbnail = models.CharField(max_length=50)
-    song = models.FileField(upload_to='mp3')
+    song = models.FileField(upload_to='mp3', blank=True)
 
     @property
     def duration(self):
@@ -51,3 +49,4 @@ class Playlist(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
